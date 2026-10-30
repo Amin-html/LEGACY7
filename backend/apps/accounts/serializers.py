@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from .services import send_verification_email
+
 User = get_user_model()
 
 
@@ -32,7 +34,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        send_verification_email(user)
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):

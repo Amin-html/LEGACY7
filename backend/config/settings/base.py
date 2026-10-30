@@ -89,6 +89,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# --- Email и ссылки во фронт ---
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="LEGACY 7 <no-reply@legacy7.local>")
+PASSWORD_RESET_TIMEOUT = 60 * 60  # ссылка сброса пароля живёт 1 час
+
 # --- CORS / CSRF ---
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = True
