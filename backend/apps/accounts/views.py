@@ -56,6 +56,14 @@ class RefreshView(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
+    def get_authenticate_header(self, request):
+        # Без этого DRF превращает 401 в 403
+        return 'Bearer realm="api"'
+
+    def get_authenticate_header(self, request):
+        # Без этого DRF превращает 401 в 403
+        return 'Bearer realm="api"'
+
     def post(self, request):
         token = request.COOKIES.get(REFRESH_COOKIE)
         if not token:
