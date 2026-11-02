@@ -25,7 +25,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
 ]
-LOCAL_APPS = ["apps.accounts", "apps.contests"]
+LOCAL_APPS = ["apps.accounts", "apps.contests", "apps.submissions"]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 AUTH_USER_MODEL = "accounts.User"
