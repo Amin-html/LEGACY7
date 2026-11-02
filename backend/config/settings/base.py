@@ -24,7 +24,7 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
 ]
-LOCAL_APPS = ["apps.accounts"]
+LOCAL_APPS = ["apps.accounts", "apps.contests"]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 AUTH_USER_MODEL = "accounts.User"
