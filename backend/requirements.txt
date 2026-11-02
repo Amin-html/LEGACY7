@@ -5,6 +5,7 @@ django-cors-headers>=4.4
 django-environ>=0.11
 psycopg[binary]>=3.2
 Pillow>=10.4
+django-filter>=24.3
 google-auth>=2.30
 requests>=2.32
 pytest>=8.3
