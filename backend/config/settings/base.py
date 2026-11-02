@@ -120,3 +120,6 @@ SIMPLE_JWT = {
 }
 AUTH_COOKIE_SECURE = not DEBUG
 AUTH_COOKIE_SAMESITE = env("AUTH_COOKIE_SAMESITE", default="Lax")
+
+# --- Google OAuth (для ID-token потока нужен только Client ID) ---
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")

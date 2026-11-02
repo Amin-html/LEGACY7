@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import Profile, User
+from .models import Profile, SocialAccount, User
 
 
 @admin.register(User)
@@ -19,3 +19,4 @@ class UserAdmin(DjangoUserAdmin):
 
 
 admin.site.register(Profile)
+admin.site.register(SocialAccount)
