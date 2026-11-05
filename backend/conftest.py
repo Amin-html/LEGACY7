@@ -12,6 +12,12 @@ def clear_throttle_cache():
     cache.clear()
 
 
+@pytest.fixture(autouse=True)
+def fast_password_hasher(settings):
+    """В тестах пароли хешируются быстро: прогон идёт в разы быстрее."""
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
 @pytest.fixture
 def api():
     return APIClient()

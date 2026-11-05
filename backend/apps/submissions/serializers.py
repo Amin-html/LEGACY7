@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
@@ -34,6 +36,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
         # Конкурс выбирается один раз при создании, перенести работу в другой нельзя
         if self.instance is not None:
             self.fields["contest"].read_only = True
+
+    def validate_link(self, value):
+        # DRF подменяет валидатор из модели на мягкий, поэтому схему проверяем тут
+        if value and urlparse(value).scheme.lower() not in ("http", "https"):
+            raise serializers.ValidationError("Разрешены только ссылки http и https.")
+        return value
 
     def validate_contest(self, contest):
         if not contest.is_open:
