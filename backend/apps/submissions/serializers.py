@@ -8,9 +8,19 @@ from apps.contests.models import Contest
 from .models import Submission
 
 DUPLICATE = "Ты уже подал работу на этот конкурс."
+FILE_FIELDS = ("has_file", "file_name", "file_type", "file_size")
 
 
-class SubmissionSerializer(serializers.ModelSerializer):
+class FileInfoMixin(serializers.Serializer):
+    """Сведения о файле. Путь на диске наружу не отдаём: файл скачивают через API."""
+
+    has_file = serializers.SerializerMethodField()
+
+    def get_has_file(self, obj):
+        return bool(obj.file)
+
+
+class SubmissionSerializer(FileInfoMixin, serializers.ModelSerializer):
     """Работа глазами автора."""
 
     contest = serializers.SlugRelatedField(
@@ -26,9 +36,10 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "id", "contest", "contest_title", "contest_deadline", "title", "description",
             "link", "status", "moderation_comment", "can_edit", "submitted_at",
             "created_at", "updated_at",
-        )
+        ) + FILE_FIELDS
         read_only_fields = (
             "id", "status", "moderation_comment", "submitted_at", "created_at", "updated_at",
+            "file_name", "file_type", "file_size",
         )
 
     def __init__(self, *args, **kwargs):
@@ -70,7 +81,7 @@ class AuthorSerializer(serializers.Serializer):
     username = serializers.CharField()
 
 
-class ManageSubmissionSerializer(serializers.ModelSerializer):
+class ManageSubmissionSerializer(FileInfoMixin, serializers.ModelSerializer):
     """Работа глазами организатора."""
 
     author = AuthorSerializer(read_only=True)
@@ -80,17 +91,17 @@ class ManageSubmissionSerializer(serializers.ModelSerializer):
         fields = (
             "id", "author", "title", "description", "link", "status",
             "moderation_comment", "submitted_at",
-        )
+        ) + FILE_FIELDS
 
 
-class PublicSubmissionSerializer(serializers.ModelSerializer):
+class PublicSubmissionSerializer(FileInfoMixin, serializers.ModelSerializer):
     """Публичная витрина: только имя автора, без email."""
 
     author = serializers.CharField(source="author.username", read_only=True)
 
     class Meta:
         model = Submission
-        fields = ("id", "title", "description", "link", "author", "submitted_at")
+        fields = ("id", "title", "description", "link", "author", "submitted_at") + FILE_FIELDS
 
 
 class ModerateSerializer(serializers.Serializer):

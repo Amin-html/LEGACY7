@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
+from .cover_views import ContestCoverView
 from .manage_views import ManageContestViewSet
 from .views import CategoryListView, ContestDetailView, ContestListView
 
@@ -12,4 +13,5 @@ urlpatterns = [
     path("contests/", ContestListView.as_view(), name="contest-list"),
     # str, а не slug: slug-конвертер Django не понимает кириллицу
     path("contests/<str:slug>/", ContestDetailView.as_view(), name="contest-detail"),
+    path("manage/contests/<int:pk>/cover/", ContestCoverView.as_view(), name="manage-contest-cover"),
 ] + router.urls

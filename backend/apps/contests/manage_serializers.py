@@ -19,10 +19,10 @@ class ContestManageSerializer(serializers.ModelSerializer):
         fields = (
             "id", "slug", "title", "description", "rules", "category", "category_name",
             "status", "is_open", "starts_at", "deadline", "currency", "public_submissions",
-            "prizes", "criteria", "created_at", "updated_at",
+            "prizes", "criteria", "cover", "created_at", "updated_at",
         )
         # status меняется только через publish/archive, slug стабилен
-        read_only_fields = ("id", "slug", "status", "created_at", "updated_at")
+        read_only_fields = ("id", "slug", "status", "cover", "created_at", "updated_at")
 
     def validate_prizes(self, value):
         places = [p["place"] for p in value]

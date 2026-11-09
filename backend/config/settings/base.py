@@ -86,7 +86,12 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"  # публичные файлы (обложки конкурсов)
+PRIVATE_MEDIA_ROOT = BASE_DIR / "private_media"  # работы участников, наружу не раздаются
+
+# --- Загрузки файлов ---
+SUBMISSION_FILE_MAX_MB = env.int("SUBMISSION_FILE_MAX_MB", default=25)
+COVER_MAX_MB = env.int("COVER_MAX_MB", default=5)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

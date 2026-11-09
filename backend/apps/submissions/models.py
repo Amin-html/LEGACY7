@@ -2,6 +2,13 @@ from django.conf import settings
 from django.core.validators import URLValidator
 from django.db import models
 
+from apps.common.storage import PrivateStorage
+
+
+def submission_upload_path(instance, filename):
+    # К этому моменту filename уже случайный: его задаёт сервер, а не пользователь
+    return f"submissions/{instance.contest_id}/{filename}"
+
 
 class Submission(models.Model):
     class Status(models.TextChoices):
@@ -27,6 +34,12 @@ class Submission(models.Model):
     )
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     moderation_comment = models.CharField(max_length=1000, blank=True)
+    file = models.FileField(
+        upload_to=submission_upload_path, storage=PrivateStorage(), blank=True, max_length=255
+    )
+    file_name = models.CharField(max_length=120, blank=True)  # имя для показа
+    file_type = models.CharField(max_length=50, blank=True)  # MIME, определён по содержимому
+    file_size = models.PositiveIntegerField(default=0)
     submitted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
