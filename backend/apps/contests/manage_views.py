@@ -12,6 +12,9 @@ from .manage_serializers import (
     JuryAssignSerializer,
     JurySerializer,
 )
+from apps.judging.models import Evaluation
+from apps.submissions.models import Submission
+
 from .models import Contest, ContestJury
 
 User = get_user_model()
@@ -69,6 +72,63 @@ class ManageContestViewSet(viewsets.ModelViewSet):
             return Response({"detail": problems}, status=status.HTTP_400_BAD_REQUEST)
 
         contest.status = Contest.Status.PUBLISHED
+        contest.save(update_fields=["status", "updated_at"])
+        return Response(self.get_serializer(contest).data)
+
+    @action(detail=True, methods=["post"], url_path="start-judging", url_name="start-judging")
+    def start_judging(self, request, pk=None):
+        contest = self.get_object()
+        if contest.status != Contest.Status.PUBLISHED:
+            return Response(
+                {"detail": "Начать оценивание можно только в опубликованном конкурсе."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        problems = []
+        if contest.deadline > timezone.now():
+            problems.append("Приём работ ещё идёт: дождись дедлайна.")
+        pending = contest.submissions.filter(status=Submission.Status.SUBMITTED).count()
+        if pending:
+            problems.append(f"Проверь все поданные работы: на модерации {pending}.")
+        if not contest.submissions.filter(status=Submission.Status.ACCEPTED).exists():
+            problems.append("Нет принятых работ для оценивания.")
+        if not contest.jury_assignments.exists():
+            problems.append("Назначь хотя бы одного судью.")
+        if problems:
+            return Response({"detail": problems}, status=status.HTTP_400_BAD_REQUEST)
+
+        contest.status = Contest.Status.JUDGING
+        contest.save(update_fields=["status", "updated_at"])
+        return Response(self.get_serializer(contest).data)
+
+    @action(detail=True, methods=["post"])
+    def finish(self, request, pk=None):
+        contest = self.get_object()
+        if contest.status != Contest.Status.JUDGING:
+            return Response(
+                {"detail": "Завершить можно только конкурс, в котором идёт оценивание."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        accepted = contest.submissions.filter(status=Submission.Status.ACCEPTED).count()
+        judges = list(contest.jury_assignments.values_list("judge_id", flat=True))
+        expected = accepted * len(judges)
+        done = Evaluation.objects.filter(
+            submission__contest=contest,
+            submission__status=Submission.Status.ACCEPTED,
+            judge_id__in=judges,
+            status=Evaluation.Status.FINAL,
+        ).count()
+        missing = expected - done
+        force = request.data.get("force") in (True, "true", "True")
+        if missing > 0 and not force:
+            return Response(
+                {
+                    "detail": f"Не все оценки подтверждены: не хватает {missing} из {expected}. "
+                    'Чтобы завершить всё равно, передай {"force": true}.',
+                    "missing": missing,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        contest.status = Contest.Status.FINISHED
         contest.save(update_fields=["status", "updated_at"])
         return Response(self.get_serializer(contest).data)
 

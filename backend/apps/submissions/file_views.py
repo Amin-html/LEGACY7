@@ -35,6 +35,14 @@ def can_view_submission_file(user, submission):
         return False
     if user.role == User.Role.ADMIN or user.pk == submission.author_id:
         return True
+    # Назначенный судья видит файлы принятых работ, пока идёт оценивание и после него
+    if (
+        user.role == User.Role.JURY
+        and submission.status == Submission.Status.ACCEPTED
+        and contest.status in (Contest.Status.JUDGING, Contest.Status.FINISHED)
+        and contest.jury_assignments.filter(judge=user).exists()
+    ):
+        return True
     # Организатор видит файлы только поданных работ своего конкурса, но не черновики
     return contest.organizer_id == user.pk and submission.status != Submission.Status.DRAFT
 
