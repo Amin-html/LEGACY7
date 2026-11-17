@@ -139,6 +139,11 @@ class ManageContestViewSet(viewsets.ModelViewSet):
             return Response(
                 {"detail": "Конкурс уже в архиве."}, status=status.HTTP_400_BAD_REQUEST
             )
+        if contest.status == Contest.Status.FINISHED:
+            return Response(
+                {"detail": "Завершённый конкурс нельзя архивировать: его результаты остаются в рейтинге."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         contest.status = Contest.Status.ARCHIVED
         contest.save(update_fields=["status", "updated_at"])
         return Response(self.get_serializer(contest).data)
