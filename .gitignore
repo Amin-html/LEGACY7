@@ -10,6 +10,7 @@ venv/
 # Django
 *.sqlite3
 backend/media/
+backend/private_media/
 backend/staticfiles/
 
 # Node / Next.js

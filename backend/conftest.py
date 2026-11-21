@@ -12,6 +12,19 @@ def clear_throttle_cache():
     cache.clear()
 
 
+@pytest.fixture(autouse=True)
+def fast_password_hasher(settings):
+    """В тестах пароли хешируются быстро: прогон идёт в разы быстрее."""
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
+@pytest.fixture(autouse=True)
+def tmp_media(settings, tmp_path):
+    """Файлы тестов пишем во временную папку, а не в настоящие media."""
+    settings.MEDIA_ROOT = str(tmp_path / "media")
+    settings.PRIVATE_MEDIA_ROOT = str(tmp_path / "private")
+
+
 @pytest.fixture
 def api():
     return APIClient()

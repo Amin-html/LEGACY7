@@ -23,8 +23,9 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
+    "django_filters",
 ]
-LOCAL_APPS = ["apps.accounts"]
+LOCAL_APPS = ["apps.accounts", "apps.contests", "apps.submissions", "apps.judging", "apps.leaderboard"]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 AUTH_USER_MODEL = "accounts.User"
@@ -85,7 +86,12 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"  # публичные файлы (обложки конкурсов)
+PRIVATE_MEDIA_ROOT = BASE_DIR / "private_media"  # работы участников, наружу не раздаются
+
+# --- Загрузки файлов ---
+SUBMISSION_FILE_MAX_MB = env.int("SUBMISSION_FILE_MAX_MB", default=25)
+COVER_MAX_MB = env.int("COVER_MAX_MB", default=5)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -107,6 +113,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 12,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
     "DEFAULT_THROTTLE_RATES": {"auth": "10/min"},
 }
 
