@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/v1/", include("apps.submissions.urls")),
     path("api/v1/", include("apps.judging.urls")),
     path("api/v1/", include("apps.leaderboard.urls")),
+    path("api/v1/", include("apps.notifications.urls")),
 ]
 
 if settings.DEBUG:

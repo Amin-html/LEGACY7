@@ -13,6 +13,8 @@ from .manage_serializers import (
     JurySerializer,
 )
 from apps.judging.models import Evaluation
+from apps.notifications.models import Notification
+from apps.notifications.services import notify, notify_bulk
 from apps.submissions.models import Submission
 
 from .models import Contest, ContestJury
@@ -98,6 +100,13 @@ class ManageContestViewSet(viewsets.ModelViewSet):
 
         contest.status = Contest.Status.JUDGING
         contest.save(update_fields=["status", "updated_at"])
+        judges = User.objects.filter(jury_assignments__contest=contest)
+        notify_bulk(
+            [(judge, {"contest_slug": contest.slug}) for judge in judges],
+            Notification.Kind.JUDGING_STARTED,
+            "Началось оценивание",
+            f"В конкурсе «{contest.title}» ждут твоих оценок.",
+        )
         return Response(self.get_serializer(contest).data)
 
     @action(detail=True, methods=["post"])
@@ -130,6 +139,13 @@ class ManageContestViewSet(viewsets.ModelViewSet):
             )
         contest.status = Contest.Status.FINISHED
         contest.save(update_fields=["status", "updated_at"])
+        works = contest.submissions.filter(status=Submission.Status.ACCEPTED).select_related("author")
+        notify_bulk(
+            [(w.author, {"contest_slug": contest.slug, "submission_id": w.id}) for w in works],
+            Notification.Kind.RESULTS_PUBLISHED,
+            "Результаты опубликованы",
+            f"Итоги конкурса «{contest.title}» подведены. Открой свой результат.",
+        )
         return Response(self.get_serializer(contest).data)
 
     @action(detail=True, methods=["post"])
@@ -172,6 +188,14 @@ class ManageContestViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         assignment, created = ContestJury.objects.get_or_create(contest=contest, judge=judge)
+        if created:  # повторное назначение уведомление не дублирует
+            notify(
+                judge,
+                Notification.Kind.JURY_ASSIGNED,
+                "Тебя назначили в жюри",
+                f"Конкурс «{contest.title}».",
+                contest_slug=contest.slug,
+            )
         return Response(
             JurySerializer(assignment).data,
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,

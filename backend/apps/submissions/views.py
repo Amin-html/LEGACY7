@@ -10,6 +10,9 @@ from apps.accounts.permissions import IsEmailVerified, IsOrganizer, IsParticipan
 from apps.contests.manage_serializers import LOCKED_STATUSES
 from apps.contests.models import Contest
 
+from apps.notifications.models import Notification
+from apps.notifications.services import notify
+
 from .models import Submission
 from .serializers import (
     ManageSubmissionSerializer,
@@ -131,6 +134,23 @@ class ModerateSubmissionView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         submission.refresh_from_db()
+        links = {"contest_slug": submission.contest.slug, "submission_id": submission.id}
+        if new_status == Submission.Status.ACCEPTED:
+            notify(
+                submission.author,
+                Notification.Kind.SUBMISSION_ACCEPTED,
+                "Твою работу приняли",
+                f"Работа «{submission.title}» принята в конкурсе «{submission.contest.title}».",
+                **links,
+            )
+        else:
+            notify(
+                submission.author,
+                Notification.Kind.SUBMISSION_REJECTED,
+                "Работу отклонили",
+                f"Работа «{submission.title}» отклонена. Причина: {submission.moderation_comment}",
+                **links,
+            )
         return Response(ManageSubmissionSerializer(submission).data)
 
 
