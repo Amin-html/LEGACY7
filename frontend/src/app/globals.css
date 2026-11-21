@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-ink: #07090d;
+  --color-graphite: #111820;
+  --color-navy: #0b1520;
+  --color-gold: #f0b83e;
+  --color-gold-light: #ffe2a0;
+  --color-snow: #f5f7fa;
+  --color-muted: #9aa4b2;
+  --color-info: #00e5ff;
+  --color-danger: #f87171;
+  --shadow-card: 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-glow: 0 0 24px rgb(240 184 62 / 0.35);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-montserrat), var(--font-inter), ui-sans-serif, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-snow);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(240 184 62 / 0.35);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.hero-bg {
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 20%, rgb(240 184 62 / 0.18), transparent 70%),
+    linear-gradient(to bottom, var(--color-navy), var(--color-ink));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
