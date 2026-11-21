@@ -24,6 +24,7 @@ class User(AbstractUser):
     email = models.EmailField("email", unique=True)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PARTICIPANT)
     is_email_verified = models.BooleanField(default=False)
+    onboarding_completed = models.BooleanField(default=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True)
 
     USERNAME_FIELD = "email"
@@ -37,6 +38,28 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class SocialAccount(models.Model):
+    class Provider(models.TextChoices):
+        GOOGLE = "google", "Google"
+        GITHUB = "github", "GitHub"
+        DISCORD = "discord", "Discord"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="social_accounts"
+    )
+    provider = models.CharField(max_length=20, choices=Provider.choices)
+    uid = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["provider", "uid"], name="unique_provider_uid")
+        ]
+
+    def __str__(self):
+        return f"{self.provider}:{self.user.email}"
 
 
 class Profile(models.Model):

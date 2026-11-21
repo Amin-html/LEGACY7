@@ -4,9 +4,13 @@ __pycache__/
 .venv/
 venv/
 
+# Tests
+.pytest_cache/
+
 # Django
 *.sqlite3
 backend/media/
+backend/private_media/
 backend/staticfiles/
 
 # Node / Next.js
