@@ -124,6 +124,17 @@ class TestTokens:
 
 
 class TestMe:
+    def test_me_reports_onboarding_flag(self, api, make_user):
+        api.force_authenticate(make_user(onboarding_completed=False))
+        assert api.get(reverse("me")).data["onboarding_completed"] is False
+
+    def test_onboarding_flag_is_read_only(self, api, make_user):
+        user = make_user(onboarding_completed=False)
+        api.force_authenticate(user)
+        api.patch(reverse("me"), {"onboarding_completed": True}, format="json")
+        user.refresh_from_db()
+        assert user.onboarding_completed is False
+
     def test_requires_authentication(self, api):
         assert api.get(reverse("me")).status_code == 401
 
