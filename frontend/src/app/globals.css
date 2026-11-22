@@ -36,8 +36,12 @@
   }
 }
 
+/* Слои сверху вниз: затемнение под текст, фото (если файла нет, слой просто пропускается),
+   золотое свечение, базовый градиент. */
 .hero-bg {
   background:
+    linear-gradient(to right, var(--color-ink) 20%, rgb(7 9 13 / 0.55) 55%, transparent 100%),
+    url("/assets/hero.jpg") right center / cover no-repeat,
     radial-gradient(ellipse 60% 50% at 75% 20%, rgb(240 184 62 / 0.18), transparent 70%),
     linear-gradient(to bottom, var(--color-navy), var(--color-ink));
 }
