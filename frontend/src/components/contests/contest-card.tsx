@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import { contestStage, formatDate, formatMoney, type StageTone } from "@/lib/format";
 import type { ContestSummary } from "@/lib/types";
 
-const TONES: Record<StageTone, string> = {
+export const TONES: Record<StageTone, string> = {
   open: "bg-gold/15 text-gold",
   soon: "bg-white/10 text-snow",
   closed: "bg-white/10 text-muted",

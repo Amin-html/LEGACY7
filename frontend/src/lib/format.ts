@@ -5,6 +5,17 @@ export function formatDate(iso: string): string {
   return dateFormat.format(new Date(iso));
 }
 
+const dateTimeFormat = new Intl.DateTimeFormat("ru-RU", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+export function formatDateTime(iso: string): string {
+  return dateTimeFormat.format(new Date(iso));
+}
+
 export function formatMoney(amount: string, currency: string): string {
   const unit = currency === "KGS" ? "сом" : currency;
   return `${numberFormat.format(Number(amount))} ${unit}`;

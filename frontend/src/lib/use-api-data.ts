@@ -1,10 +1,11 @@
 "use client";
 
+import { isAxiosError } from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 import { api } from "@/lib/api";
 
-type Result<T> = { key: string; data: T | null; error: boolean };
+type Result<T> = { key: string; data: T | null; failed: boolean; status: number | null };
 
 /**
  * Загружает данные с API. Загрузка считается по ключу запроса: пока ответ не пришёл
@@ -21,10 +22,12 @@ export function useApiData<T>(url: string | null) {
     api
       .get<T>(url)
       .then((response) => {
-        if (!ignore) setResult({ key, data: response.data, error: false });
+        if (!ignore) setResult({ key, data: response.data, failed: false, status: response.status });
       })
-      .catch(() => {
-        if (!ignore) setResult({ key, data: null, error: true });
+      .catch((error: unknown) => {
+        if (ignore) return;
+        const status = isAxiosError(error) ? (error.response?.status ?? 0) : 0;
+        setResult({ key, data: null, failed: true, status });
       });
     return () => {
       ignore = true;
@@ -36,7 +39,8 @@ export function useApiData<T>(url: string | null) {
 
   return {
     data: current?.data ?? null,
-    error: current?.error ?? false,
+    error: current?.failed ?? false,
+    status: current?.status ?? null,
     loading: Boolean(url) && !current,
     reload,
   };
