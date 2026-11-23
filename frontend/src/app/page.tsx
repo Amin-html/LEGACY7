@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { PopularContests } from "@/components/home/popular-contests";
+import { TopParticipants } from "@/components/home/top-participants";
 import { buttonStyles } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -36,7 +38,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-12 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-[1fr_340px]">
+        <PopularContests />
+        <TopParticipants />
+      </div>
+
+      <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-16 md:grid-cols-3">
         {PERKS.map((perk) => (
           <Card key={perk.title} className="p-6">
             <h2 className="font-display text-lg font-bold text-gold">{perk.title}</h2>
