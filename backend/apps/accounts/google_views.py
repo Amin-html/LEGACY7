@@ -5,8 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from google.auth.exceptions import TransportError
-from google.auth.transport import logging
-import requests as google_requests
+from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 from rest_framework import permissions, serializers
 from rest_framework.response import Response
@@ -16,9 +15,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import SocialAccount
 from .serializers import UserSerializer
-from .services import logging
-import revoke_all_refresh_tokens
+from .services import revoke_all_refresh_tokens
 from .views import set_refresh_cookie
+
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
