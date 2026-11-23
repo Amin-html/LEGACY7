@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { AccountActions } from "@/components/auth/account-actions";
 import { Logo } from "@/components/logo";
-import { buttonStyles } from "@/components/ui/button";
+
 import { cn } from "@/lib/cn";
 
 const NAV = [
@@ -54,13 +55,8 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Link href="/login" className={buttonStyles({ variant: "ghost", size: "sm" })}>
-            Войти
-          </Link>
-          <Link href="/register" className={buttonStyles({ size: "sm" })}>
-            Регистрация
-          </Link>
+        <div className="hidden md:block">
+          <AccountActions layout="desktop" />
         </div>
 
         <button
@@ -102,14 +98,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              <Link href="/login" onClick={close} className={buttonStyles({ variant: "secondary" })}>
-                Войти
-              </Link>
-              <Link href="/register" onClick={close} className={buttonStyles()}>
-                Регистрация
-              </Link>
-            </div>
+            <AccountActions layout="mobile" onNavigate={close} />
           </nav>
         </div>
       )}

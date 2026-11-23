@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django.conf import settings
@@ -17,7 +18,9 @@ from .serializers import UserSerializer
 from .services import revoke_all_refresh_tokens
 from .views import set_refresh_cookie
 
+
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class GoogleLoginSerializer(serializers.Serializer):
@@ -89,10 +92,13 @@ class GoogleLoginView(APIView):
                 serializer.validated_data["id_token"],
                 google_requests.Request(),
                 settings.GOOGLE_CLIENT_ID,
+                clock_skew_in_seconds=10,
             )
         except TransportError:
             return Response({"detail": "Не удалось связаться с Google."}, status=502)
-        except ValueError:
+        except ValueError as exc:
+            # Причину пишем только в лог. Клиенту отдаём общий текст.
+            logger.warning("Google ID token rejected: %s", exc)
             return Response({"detail": "Недействительный токен Google."}, status=400)
 
         if not payload.get("email_verified") or not payload.get("email"):
