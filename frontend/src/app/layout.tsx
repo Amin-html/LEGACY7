@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Montserrat } from "next/font/google";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { Header } from "@/components/header";
+import { HeaderFallback } from "@/components/header-fallback";
 
 import "./globals.css";
 
@@ -35,7 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ru" className={`${inter.variable} ${montserrat.variable}`}>
       <body className="min-h-dvh antialiased">
         <AuthProvider>
-          <Header />
+          <Suspense fallback={<HeaderFallback />}>
+            <Header />
+          </Suspense>
           {children}
         </AuthProvider>
       </body>
